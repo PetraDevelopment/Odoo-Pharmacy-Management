@@ -26,14 +26,16 @@
             'pharmacy_mangment/static/src/xml/pos_template.xml', 
 
         ],
-        'author':'Petra Software',
+      
+        
+    },
+      'author':'Petra Software',
     'company': 'Petra Software',
     'maintainer': 'Petra Software',
     'website':'www.t-petra.com',
      'license': 'LGPL-3',
      'price':100,
     'currency':'USD'   
-        
-    }
+
 }
 
