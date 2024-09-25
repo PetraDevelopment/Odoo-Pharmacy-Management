@@ -35,7 +35,8 @@
     'website':'www.t-petra.com',
      'license': 'LGPL-3',
      'price':100,
-    'currency':'USD'   
+    'currency':'USD',
+         'images': ['static/description/banner.png'],
 
 }
 
