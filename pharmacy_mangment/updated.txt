@@ -1,0 +1,543 @@
+@api.model
+    def print_cash_transaction_in(self, session_ids):
+        if not session_ids:
+            return
+
+        session = self.browse(session_ids[0])
+        ext_session_id = session.id
+
+        # Execute the SQL query to fetch move_line_name and balance
+        self.env.cr.execute("""
+            SELECT
+                aml.name AS move_line_name,
+                aml.debit
+            FROM
+                account_move_line aml
+            LEFT JOIN
+                account_account aa ON aml.account_id = aa.id
+            WHERE
+                aa.name = 'Cash'
+                AND (aml.name LIKE '%-in-%' OR aml.name LIKE '%-out-%')
+        """)
+
+        query_results = self.env.cr.fetchall()
+
+        # Get company details
+        company = self.env.user.company_id
+        logo = company.logo
+        name = company.name
+        phone = company.phone
+        vat = company.vat
+        email = company.email
+        website = company.website
+
+        # Prepare the PDF
+        buffer = BytesIO()
+        height = 512  # Receipt height in points
+        width = 300  # Initial width; will be updated based on content
+        p = canvas.Canvas(buffer, pagesize=(width, height))
+
+        # Helper function to center text
+        def draw_centered_text(text, y_position, font_size=10, font_name="Helvetica"):
+            nonlocal width
+            p.setFont(font_name, font_size)
+            text_width = p.stringWidth(text, font_name, font_size)
+            p.drawString((width - text_width) / 2, y_position, text)
+            return y_position
+
+        # Helper function to center a block of text with spacing
+        def draw_centered_text_block(lines, y_position, font_size=10, font_name="Helvetica", before_space=15, after_space=15):
+            nonlocal width
+            p.setFont(font_name, font_size)
+            max_text_width = 0
+            for line in lines:
+                text_width = p.stringWidth(line, font_name, font_size)
+                if text_width > max_text_width:
+                    max_text_width = text_width
+
+            width = max(width, max_text_width)  # Update width to the widest text block
+            # Add space before the text block
+            y_position -= before_space
+            for line in lines:
+                text_width = p.stringWidth(line, font_name, font_size)
+                p.drawString((width - text_width) / 2, y_position, line)
+                y_position -= 15  # Line spacing for each line
+            # Add space after the text block
+            y_position -= after_space
+            return y_position
+
+        # Helper function to wrap text to fit within the receipt width
+        def wrap_text(text, max_width, font_size=10, font_name="Helvetica"):
+            p.setFont(font_name, font_size)
+            words = text.split()
+            lines = []
+            current_line = ""
+            for word in words:
+                test_line = f"{current_line} {word}".strip()
+                if p.stringWidth(test_line, font_name, font_size) <= max_width:
+                    current_line = test_line
+                else:
+                    lines.append(current_line)
+                    current_line = word
+            if current_line:
+                lines.append(current_line)
+            return lines
+
+        # Add company logo
+        if logo:
+            logo_data = base64.b64decode(logo)
+            with tempfile.NamedTemporaryFile(delete=False, suffix='.png') as tmpfile:
+                tmpfile.write(logo_data)
+                tmpfile.flush()
+                logo_path = tmpfile.name
+            logo_width = 100
+            logo_height = 50
+            p.drawImage(logo_path, (width - logo_width) / 2, height - logo_height, width=logo_width, height=logo_height)  # Center the logo
+            height -= logo_height
+        else:
+            height = draw_centered_text(name, height, font_size=14, font_name="Helvetica-Bold")
+            height -= 20  # Adjust the space after the company name
+
+        # Add company details with added spaces before and after
+        details = []
+        if name:
+            details.append(name)  # Add company name here
+        if phone:
+            details.append(f"Tel: {phone}")
+        if vat:
+            details.append(f"VAT: {vat}")
+        if email:
+            details.append(f"Email: {email}")
+        if website:
+            details.append(f"Website: {website}")
+
+        height = draw_centered_text_block(details, height, font_size=10, font_name="Helvetica", before_space=20, after_space=20)
+
+        # Add Title - Centered
+        title = "Cash In"
+        height = draw_centered_text(title, height, font_size=14, font_name="Helvetica-Bold")
+        height -= 30  # Adjust spacing after the title
+
+        # Define starting Y position for data rows
+        start_y_position = height
+
+        # Add Data Rows
+        p.setFont("Helvetica", 10)
+        for result in query_results:
+            move_line_name, debit = result
+
+            # Split move_line_name into parts using '-' as delimiter
+            parts = move_line_name.split('-')
+            if len(parts) >= 3:
+                real_session_id = parts[0].split('/')[-1].lstrip('0')  # Extract '20' from 'POS/000020-out-noooo'
+                state = parts[1]  # Extract 'out' from 'POS/000020-out-noooo'
+                reason = '-'.join(parts[2:])  # Extract 'noooo' from 'POS/000020-out-noooo'
+            else:
+                real_session_id = ""
+                state = ""
+                reason = ""
+
+            # Check if ext_session_id matches real_session_id
+            if ext_session_id == int(real_session_id) and state == 'in':  # Convert real_session_id to int for comparison
+                # Draw "Reason:" label and reason text
+                reason_label = "Reason:"
+                reason_text = reason
+
+                # Draw "Reason:" label
+                p.setFont("Helvetica-Bold", 10)
+                p.drawString(0, start_y_position, reason_label)
+                p.setFont("Helvetica", 10)
+
+                # Calculate the available width for the reason text
+                reason_label_width = p.stringWidth(reason_label, "Helvetica-Bold", 10)
+                available_width = width - reason_label_width - 10  # 10 points for padding
+
+                # Wrap the reason text
+                wrapped_reason_lines = wrap_text(reason_text, available_width, font_size=10, font_name="Helvetica")
+
+                # Draw the reason text beside the label
+                y_position = start_y_position
+                for i, line in enumerate(wrapped_reason_lines):
+                    if i == 0:
+                        p.drawString(reason_label_width + 10, y_position, line)
+                    else:
+                        p.drawString(10, y_position, line)  # Draw from the start of the line
+                    y_position -= 15  # Line spacing for each line
+
+                # Draw "Amount:" label and amount with the same format as Reason
+                amount_label = "Amount:"
+                amount_text = f"{str(debit)}"
+                p.setFont("Helvetica-Bold", 10)
+                p.drawString(0, y_position - 15, amount_label)
+                p.setFont("Helvetica", 10)
+                p.drawString(reason_label_width + 10, y_position - 15, amount_text)
+
+                # Draw a dotted line after the amount
+                p.setDash(1, 2)  # Set the dash pattern: 1 point on, 2 points off
+                p.line(0, y_position - 30, width, y_position - 30)
+                p.setDash()  # Reset the dash pattern
+
+                # Move to the next block
+                start_y_position = y_position - 45  # Adjust spacing for the next entry
+
+        # Update height for the PDF
+        height = start_y_position
+
+        # Set the final page size with width as the max content width and height as fixed
+        p.setPageSize((width, 512))  # Set the width based on content and fixed height of 512 points
+        p.showPage()
+        p.save()
+        buffer.seek(0)
+
+        # Create the attachment
+        pdf_content = buffer.getvalue()
+        buffer.close()
+
+        attachment = {
+            'name': f'Cash_Transactions_{ext_session_id}.pdf',
+            'type': 'binary',
+            'datas': base64.b64encode(pdf_content).decode('utf-8'),  # Convert to a string for the attachment
+            'mimetype': 'application/pdf'
+        }
+
+        # Create or update the attachment
+        attachment_id = self.env['ir.attachment'].create({
+            'name': attachment['name'],
+            'type': attachment['type'],
+            'datas': attachment['datas'],
+            'mimetype': attachment['mimetype'],
+            'res_model': 'pos.session',
+            'res_id': session.id,
+        })
+
+        # Return the attachment as an action
+        return {
+            'type': 'ir.actions.act_url',
+            'url': f'/web/content/{attachment_id.id}?download=true',
+            'target': 'new',
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    
+    
+    
+    # def print_cash_transactions_out(self):
+        # Print POS Session ID
+    #     ext_session_id = self.id
+    #     print(f"POS Session ID: {self.id}")
+
+    #     # Execute the SQL query to fetch move_line_name and balance
+    #     self.env.cr.execute("""
+    #         SELECT
+    #             aml.name AS move_line_name,
+    #             aml.balance,
+    #             aml.credit
+    #         FROM
+    #             account_move_line aml
+    #         LEFT JOIN
+    #             account_account aa ON aml.account_id = aa.id
+    #         WHERE
+    #             aa.name = 'Cash'
+    #             AND (aml.name LIKE '%-in-%' OR aml.name LIKE '%-out-%')
+    #     """)
+        
+    #     # Fetch all results from the executed query
+    #     query_results = self.env.cr.fetchall()
+
+    #     # Process each result fetched from the query
+    #     for result in query_results:
+    #         move_line_name, balance, credit = result
+            
+    #         # Split move_line_name into parts using '-' as delimiter
+    #         parts = move_line_name.split('-')
+            
+    #         # Extract real_session_id, state, and reason
+    #         if len(parts) >= 3:
+    #             real_session_id = parts[0].split('/')[-1].lstrip('0')  # Extract '20' from 'POS/000020-out-noooo'
+    #             state = parts[1]  # Extract 'out' from 'POS/000020-out-noooo'
+    #             reason = '-'.join(parts[2:])  # Extract 'noooo' from 'POS/000020-out-noooo'
+    #         else:
+    #             real_session_id = ""
+    #             state = ""
+    #             reason = ""
+        
+    #         # Check if ext_session_id matches real_session_id
+    #         if ext_session_id == int(real_session_id) and state =='out':  # Convert real_session_id to int for comparison
+    #             # Print the parsed values if condition is met
+    #             print(f"Real Session ID: {real_session_id}, State: OUT, Reason: {reason}, Balance: {credit}")
+
+    #     return True
+    
+    # def print_in_out_cash_transaction(self):
+    #     # Print POS Session ID
+    #     ext_session_id = self.id
+    #     print(f"POS Session ID: {self.id}")
+
+    #     # Execute the SQL query to fetch move_line_name, balance, debit, and credit
+    #     self.env.cr.execute("""
+    #         SELECT
+    #             aml.name AS move_line_name,
+    #             aml.balance,
+    #             aml.debit,
+    #             aml.credit
+    #         FROM
+    #             account_move_line aml
+    #         LEFT JOIN
+    #             account_account aa ON aml.account_id = aa.id
+    #         WHERE
+    #             aa.name = 'Cash'
+    #             AND (aml.name LIKE '%-in-%' OR aml.name LIKE '%-out-%')
+    #     """)
+
+    #     # Fetch all results from the executed query
+    #     query_results = self.env.cr.fetchall()
+
+    #     # Process each result fetched from the query
+    #     for result in query_results:
+    #         move_line_name, balance, debit, credit = result
+
+    #         # Split move_line_name into parts using '-' as delimiter
+    #         parts = move_line_name.split('-')
+
+    #         # Extract real_session_id, state, and reason
+    #         if len(parts) >= 3:
+    #             real_session_id = parts[0].split('/')[-1].lstrip('0')  # Extract '20' from 'POS/000020-out-noooo'
+    #             state = parts[1]  # Extract 'out' from 'POS/000020-out-noooo'
+    #             reason = '-'.join(parts[2:])  # Extract 'noooo' from 'POS/000020-out-noooo'
+    #         else:
+    #             real_session_id = ""
+    #             state = ""
+    #             reason = ""
+
+    #         # Check if ext_session_id matches real_session_id
+    #         if ext_session_id == int(real_session_id) :  # Convert real_session_id to int for comparison
+    #             # Print the parsed values if condition is met
+    #             print(f"Real Session ID: {real_session_id}, State: {state}, Reason: {reason}, Balance: {balance}, Debit: {debit}, Credit: {credit}")
+
+    #     return True
+    @api.model
+    def print_cash_transaction_out(self, session_ids):
+        if not session_ids:
+            return
+
+        session = self.browse(session_ids[0])
+        ext_session_id = session.id
+
+        # Execute the SQL query to fetch move_line_name and balance
+        self.env.cr.execute("""
+            SELECT
+                aml.name AS move_line_name,
+                aml.credit
+            FROM
+                account_move_line aml
+            LEFT JOIN
+                account_account aa ON aml.account_id = aa.id
+            WHERE
+                aa.name = 'Cash'
+                AND (aml.name LIKE '%-in-%' OR aml.name LIKE '%-out-%')
+        """)
+
+        query_results = self.env.cr.fetchall()
+
+        # Get company details
+        company = self.env.user.company_id
+        logo = company.logo
+        name = company.name
+        phone = company.phone
+        vat = company.vat
+        email = company.email
+        website = company.website
+
+        # Prepare the PDF
+        buffer = BytesIO()
+        height = 512  # Receipt height in points
+        width = 300    # Initial width; will be updated based on content
+        p = canvas.Canvas(buffer, pagesize=(width, height))
+
+        # Helper function to center text
+        def draw_centered_text(text, y_position, font_size=10, font_name="Helvetica"):
+            nonlocal width
+            p.setFont(font_name, font_size)
+            text_width = p.stringWidth(text, font_name, font_size)
+            p.drawString((width - text_width) / 2, y_position, text)
+            return y_position
+
+        # Helper function to center a block of text with spacing
+        def draw_centered_text_block(lines, y_position, font_size=10, font_name="Helvetica", before_space=15, after_space=15):
+            nonlocal width
+            p.setFont(font_name, font_size)
+            max_text_width = 0
+            for line in lines:
+                text_width = p.stringWidth(line, font_name, font_size)
+                if text_width > max_text_width:
+                    max_text_width = text_width
+
+            width = max(width, max_text_width)  # Update width to the widest text block
+            # Add space before the text block
+            y_position -= before_space
+            for line in lines:
+                text_width = p.stringWidth(line, font_name, font_size)
+                p.drawString((width - text_width) / 2, y_position, line)
+                y_position -= 15  # Line spacing for each line
+            # Add space after the text block
+            y_position -= after_space
+            return y_position
+
+        # Helper function to wrap text to fit within the receipt width
+        def wrap_text(text, max_width, font_size=10, font_name="Helvetica"):
+            p.setFont(font_name, font_size)
+            words = text.split()
+            lines = []
+            current_line = ""
+            for word in words:
+                test_line = f"{current_line} {word}".strip()
+                if p.stringWidth(test_line, font_name, font_size) <= max_width:
+                    current_line = test_line
+                else:
+                    lines.append(current_line)
+                    current_line = word
+            if current_line:
+                lines.append(current_line)
+            return lines
+
+        # Helper function to draw a dotted line
+        def draw_dotted_line(start_x, y_position, line_length, dot_size=2, gap_size=2):
+            p.setLineWidth(0.5)
+            x = start_x
+            while x < start_x + line_length:
+                p.drawString(x, y_position, '.')
+                x += dot_size + gap_size
+
+        # Add company logo
+        if logo:
+            logo_data = base64.b64decode(logo)
+            with tempfile.NamedTemporaryFile(delete=False, suffix='.png') as tmpfile:
+                tmpfile.write(logo_data)
+                tmpfile.flush()
+                logo_path = tmpfile.name
+            logo_width = 100
+            logo_height = 50
+            p.drawImage(logo_path, (width - logo_width) / 2, height - logo_height, width=logo_width, height=logo_height)  # Center the logo
+            height -= logo_height
+        else:
+            height = draw_centered_text(name, height, font_size=14, font_name="Helvetica-Bold")
+            height -= 20  # Adjust the space after the company name
+
+        # Add company details with added spaces before and after
+        details = []
+        if name:
+            details.append(name)  # Add company name here
+        if phone:
+            details.append(f"Tel: {phone}")
+        if vat:
+            details.append(f"VAT: {vat}")
+        if email:
+            details.append(f"Email: {email}")
+        if website:
+            details.append(f"Website: {website}")
+
+        height = draw_centered_text_block(details, height, font_size=10, font_name="Helvetica", before_space=20, after_space=20)
+
+        # Add Title - Centered
+        title = "Cash Out"
+        height = draw_centered_text(title, height, font_size=14, font_name="Helvetica-Bold")
+        height -= 30  # Adjust spacing after the title
+
+        # Define starting Y position for data rows
+        start_y_position = height
+
+        # Add Data Rows
+        p.setFont("Helvetica", 10)
+        for result in query_results:
+            move_line_name, credit = result
+
+            # Split move_line_name into parts using '-' as delimiter
+            parts = move_line_name.split('-')
+            if len(parts) >= 3:
+                real_session_id = parts[0].split('/')[-1].lstrip('0')  # Extract '20' from 'POS/000020-out-noooo'
+                state = parts[1]  # Extract 'out' from 'POS/000020-out-noooo'
+                reason = '-'.join(parts[2:])  # Extract 'noooo' from 'POS/000020-out-noooo'
+            else:
+                real_session_id = ""
+                state = ""
+                reason = ""
+
+            # Check if ext_session_id matches real_session_id
+            if ext_session_id == int(real_session_id) and state == 'out':  # Convert real_session_id to int for comparison
+                # Draw "Reason:" label
+                p.setFont("Helvetica-Bold", 10)
+                p.drawString(0, start_y_position, "    Reason:")
+
+                # Draw the wrapped reason text beside the label
+                wrapped_reason_lines = wrap_text(reason, width - 80, font_size=10, font_name="Helvetica")
+                y_position = start_y_position
+                p.setFont("Helvetica", 10)
+                for line in wrapped_reason_lines:
+                    p.drawString(80, y_position, line)
+                    y_position -= 15  # Line spacing for each line
+
+                # Draw "Amount:" label and amount
+                p.setFont("Helvetica-Bold", 10)
+                p.drawString(0, y_position - 15, "    Amount:")
+                p.setFont("Helvetica", 10)
+                p.drawString(80, y_position - 15, str(credit))
+
+                # Draw a centered dotted line
+                dotted_line_y_position = y_position - 30  # Y position for the dotted line
+                draw_dotted_line(0, dotted_line_y_position, width)  # Draw the dotted line
+
+                # Add a line break after the dotted line
+                start_y_position = dotted_line_y_position - 30  # Adjust space after the line break
+
+        # Update height for the PDF
+        height = start_y_position
+
+        # Set the final page size with width as the max content width and height as fixed
+        p.setPageSize((width, 512))  # Set the width based on content and fixed height of 512 points
+        p.showPage()
+        p.save()
+        buffer.seek(0)
+
+        # Create the attachment
+        pdf_content = buffer.getvalue()
+        buffer.close()
+
+        attachment = {
+            'name': f'Cash_Out_Transactions_{ext_session_id}.pdf',
+            'type': 'binary',
+            'datas': base64.b64encode(pdf_content).decode('utf-8'),  # Convert to a string for the attachment
+            'mimetype': 'application/pdf'
+        }
+
+        # Create or update the attachment
+        attachment_id = self.env['ir.attachment'].create({
+            'name': attachment['name'],
+            'type': attachment['type'],
+            'datas': attachment['datas'],
+            'mimetype': attachment['mimetype'],
+            'res_model': 'pos.session',
+            'res_id': session.id,
+        })
+
+        # Return the attachment as an action
+        return {
+            'type': 'ir.actions.act_url',
+            'url': f'/web/content/{attachment_id.id}?download=true',
+            'target': 'new',
+        }

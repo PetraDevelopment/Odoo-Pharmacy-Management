@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+   <record id="pos_setting_id" model="ir.ui.view">
+       <field name="name">pos.setting.id</field>
+       <field name="model">res.config.settings</field>
+       <field name="inherit_id" ref="point_of_sale.res_config_settings_view_form"/>
+       <field name="arch" type="xml">
+           <xpath expr="//div[@id='pos_payment_section']" position="inside">
+               
+               <div class="col-12 col-lg-6 o_setting_box" id="cash_control ">
+                   <div class="o_setting_left_pane">
+                       <field name="cash_control" string='Advanced Cash Control'/>
+                   </div>
+                   <div class="o_setting_right_pane">
+                       <label for="cash_control" string="Advanced Cash Control"/>
+                       <div class="text-muted mb16">
+                            Control cash box at opening and closing
+                            <br></br>
+
+                            <b>Authorized Difference 0.00</b>
+                       </div>
+                   </div>
+               </div>
+           </xpath>
+       </field>
+   </record>
+</odoo>

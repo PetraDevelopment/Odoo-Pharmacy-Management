@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <data>
+        <record id="group_approve_purchase" model="res.groups">
+            <field name="name">Can Approve Purchase Order</field>
+        </record>
+
+        <record id="group_verify_purchase" model="res.groups">
+            <field name="name">Can Verify Purchase Order</field>
+        </record>
+    </data>
+
+</odoo>

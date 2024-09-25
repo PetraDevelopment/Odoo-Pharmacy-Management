@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+pharmacy_mangment.access_medcine_shape,access_medcine_shape,pharmacy_mangment.model_medcine_shape,base.group_user,1,1,1,1
+pharmacy_mangment.access_effective_material,access_effective_material,pharmacy_mangment.model_effective_material,base.group_user,1,1,1,1
+pharmacy_mangment.access_reject_reason_wizard,access_reject_reason_wizard,pharmacy_mangment.model_reject_reason_wizard,base.group_user,1,1,1,1
+pharmacy_mangment.access_quotation_reject_reason,access_quotation_reject_reason,pharmacy_mangment.model_quotation_reject_reason,base.group_user,1,1,1,1
+pharmacy_mangment.access_cash_transaction,access_cash_transaction,pharmacy_mangment.model_cash_transaction,base.group_user,1,1,1,1

@@ -1,0 +1,12 @@
+SELECT
+    aml.name AS move_line_name,
+    aml.balance,
+    aml.debit,
+    aml.credit
+FROM
+    account_move_line aml
+LEFT JOIN
+    account_account aa ON aml.account_id = aa.id
+WHERE
+    aa.name = 'Cash'
+    AND (aml.name LIKE '%-in-%' OR aml.name LIKE '%-out-%');

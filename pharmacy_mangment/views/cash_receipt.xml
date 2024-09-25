@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!-- Define the template for the new button -->
+        <template id="EnhancedCashMoveButton" inherit_id="point_of_sale.CashMoveButton">
+            <xpath expr="//div[@class='button-container']" position="inside">
+                <button t-if="!props.is_hidden" class="button" t-on-click="onPrintReceipt">
+                    <t t-esc="env._t('Print Receipt')"/>
+                </button>
+            </xpath>
+        </template>
+    </data>
+</odoo>

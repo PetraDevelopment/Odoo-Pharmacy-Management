@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pharmacy Management</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        h1 {
+            text-align: center;
+        }
+        h2 {
+            text-align: center;
+        }
+        .message {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .responsive-img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: auto;
+        }
+
+        .image-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .gray-square {
+            width: 800px; 
+            height: 400px; 
+            background-color: 	#E8E8E8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        @media screen and (max-width: 600px) {
+            .container {
+                padding: 10px;
+            }
+            .image-container {
+                flex-direction: column;
+            }
+            .gray-square {
+                width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Pharmacy Management</h1>
+        <h2>Description</h2>
+        <div class="message">
+            <h2>POS cash in & cash out (POS Configuration)</h2>
+            <h4>-When user enables the Cash Control option it enables functionality on the pos screen.
+                <br/>
+                First: open configuration from pos module and check in advanced cash control.
+            </h4>
+        </div>
+        <img src="assets/img1.png" alt="Image 1" class="responsive-img" style="width: 100%;">
+        
+        
+        <div class="message">
+            <h2>Cash In Workflow</h2>
+            <h4>-POS User can see a new "Cash In/out" button on POS screen press on it.</h4>
+        </div>
+        <div class="image-container">
+            <div class="gray-square">
+                <img src="assets/img2.png" alt="Image 2" class="responsive-img" style="width: 100%;">
+            </div>
+        </div>
+
+        <div class="message">
+            <h2>On click of the above button it opens a popup window where user can select cash in, enter the reason and amount of cash he wants to add into the cashbox.</h2>
+        </div>
+        <div class="image-container">
+            <div class="gray-square">
+                <img src="assets/img3.png" alt="Image 2" class="responsive-img" style="width: 100%;">
+            </div>
+        </div>
+        
+        <div class="message">
+            <h2>Press on cash in button, a receipt is generated in receipt window which can be printed and the cash in entry is added into the statement.</h2>
+        </div>
+        <div class="image-container">
+            <div class="gray-square">
+                <img src="assets/img4.png" alt="Image 2" class="responsive-img" style="width: 100%;">
+                <img src="assets/img5.png" alt="Image 2" class="responsive-img" style="width: 100%;">
+            </div>
+        </div>
+
+        <div class="message">
+            <h2>Cash Out Workflow</h2>
+            <h4>-POS User can see a new "Cash Out" button on the POS screen. <br/>
+                On click of the above button it opens a popup window where user can select cash out then enter the reason and amount of cash he wants to remove from the cashbox
+            </h4>
+        </div>
+        <div class="image-container">
+            <div class="gray-square">
+                <img src="assets/img6.png" alt="Image 2" class="responsive-img" style="width: 100%;">
+            </div>
+        </div>
+
+        <div class="message">
+            <h2>Press on cash out button, a receipt is generated in receipt window which can be printed and the cash out entry is added into the statement.</h2>
+        </div>
+        <div class="image-container">
+            <div class="gray-square">
+                <img src="assets/img7.png" alt="Image 2" class="responsive-img" style="width: 100%;">
+                <img src="assets/img8.png" alt="Image 2" class="responsive-img" style="width: 100%;">
+            </div>
+        </div>
+
+        <div class="message">
+            <h2>Cash In-Out Statement</h2>
+            <h4>-A new button "Cash In-Out Statement" is added on POS screen.
+                <br>
+                Press on cash in-out statement, a receipt is generated in receipt window.
+            </h4>
+        </div>
+        <div class="image-container">
+            <div class="gray-square">
+                <img src="assets/img9.png" alt="Image 2" class="responsive-img" style="width: 100%;">
+                <img src="assets/img10.png" alt="Image 2" class="responsive-img" style="width: 100%;">
+            </div>
+        </div>
+
+        <div class="message">
+            <h2>Purchase Order Approval</h2>
+            <h4>-Go to the Settings -> Users & Companies-> Users <br/>
+                There are two groups have been made: 'Can Approve Purchase Order' if you work on the system as an admin.
+            </h4>
+        </div>
+        <div class="image-container">
+            <div class="gray-square">
+                <img src="assets/img11.png" alt="Image 2" class="responsive-img" style="width: 100%;">
+            </div>
+        </div>
+    
+
+        <div class="message">
+            <h2>Check in 'Can Verify Purchase Order' to who’s work on the system as a user.</h2>
+        </div>
+        <div class="image-container">
+            <div class="gray-square">
+                <img src="assets/img12.png" alt="Image 2" class="responsive-img" style="width: 100%;">
+            </div>
+        </div>
+
+
+        <div class="message">
+            <h2>As a user, when you create any Request for Quotation you can see 'Submit for Verify' button.</h2>
+           
+        </div>
+        <div class="image-container">
+            <div class="gray-square">
+                <img src="assets/img13.png" alt="Image 2" class="responsive-img" style="width: 100%;">
+            </div>
+        </div>
+
+
+        <div class="message">
+            <h2>After clicking on 'Submit for Verify' order state will update from 'RFQ' to 'Waiting for Verify'.</h2>
+           
+        </div>
+        <div class="image-container">
+            <div class="gray-square">
+                <img src="assets/img14.png" alt="Image 2" class="responsive-img" style="width: 100%;">
+            </div>
+        </div>
+
+
+        <div class="message">
+            <h2>Admin will Get notification which was configured in Verification. From here also admin can verify the order. users can not Verify the order.
+                Admin can Verify it and send for approval by click on 'Verify & Submit for Approval' or can also reject the order.
+                </h2>
+            
+        </div>
+        <div class="image-container">
+            <div class="gray-square">
+                <img src="assets/img15.png" alt="Image 2" class="responsive-img" style="width: 100%;">
+            </div>
+        </div>
+
+
+        <div class="message">
+            <h2>After Verifying the order state will be update from 'Waiting for Verify' to 'Waiting for Approval'.</h2>
+            
+        </div>
+        <div class="image-container">
+            <div class="gray-square">
+                <img src="assets/img16.png" alt="Image 2" class="responsive-img" style="width: 100%;">
+            </div>
+        </div>
+
+        <div class="message">
+            <h2>After approve the order state will be updated to 'Purchase Order'.</h2>
+            
+        </div>
+        <div class="image-container">
+            <div class="gray-square">
+                <img src="assets/img17.png" alt="Image 2" class="responsive-img" style="width: 100%;">
+            </div>
+        </div>
+
+        <div class="message">
+            <h2>Rejection Process</h2>
+            <h4> First you have to create the rejection reason in Purchase -> Configuration -> RFQ Reject Reason</h4>
+        </div>
+        <div class="image-container">
+            <div class="gray-square">
+                <img src="assets/img18.png" alt="Image 2" class="responsive-img" style="width: 100%;">
+                <img src="assets/img19.png" alt="Image 2" class="responsive-img" style="width: 100%;">
+            </div>
+        </div>
+
+
+        <div class="message"></div>
+            <h2>As an admonitor Reject RFQ, select RFQ Rejection Reason and then click 'Reject RFQ'.</h2>
+        </div>
+        <div class="image-container">
+            <div class="gray-square">
+                <img src="assets/img20.png" alt="Image 2" class="responsive-img" style="width: 100%;">
+                <img src="assets/img21.png" alt="Image 2" class="responsive-img" style="width: 100%;">
+            </div>
+        </div>
+
+        <div class="message"></div>
+            <h2>The order state updated to 'Cancelled'.</h2>
+        </div>
+        <div class="image-container">
+            <div class="gray-square">
+                <img src="assets/img22.png" alt="Image 2" class="responsive-img" style="width: 100%;">
+            </div>
+        </div>
+        
+    </div>
+</body>
+</html>

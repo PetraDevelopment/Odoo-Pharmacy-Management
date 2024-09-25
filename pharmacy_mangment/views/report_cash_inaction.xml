@@ -1,0 +1,10 @@
+<odoo>
+    <record id="report_cash_in" model="ir.actions.report">
+        <field name="name">Cash In Report</field>
+        <field name="model">pos.session</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">pharmacy_management.report_cash_in</field>
+        <field name="file">pharmacy_management.report_cash_in</field>
+        <field name="binding_model_id" ref="point_of_sale.model_pos_session"/>
+    </record>
+</odoo>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    
+    <record id="view_pharmacist_shape_form" model="ir.ui.view">
+        <field name="name">pharmacist.shape.form</field>
+        <field name="model">medcine.shape</field>
+        <field name="arch" type="xml">
+            <tree string="Pharmacist Shape Form">
+                    <field name="medcine_shape_name"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_pharmacist_shape" model="ir.actions.act_window">
+        <field name="name">Pharmacist Shape</field>
+        <field name="res_model">medcine.shape</field>
+        <field name="view_mode">form,tree</field>
+        <field name="view_id" ref="view_pharmacist_shape_form"/>
+    </record>
+
+    <record id="menu_pharmacist_shape_view" model="ir.ui.menu">
+        <field name="name">Pharmacist Shape</field>
+        <field name="parent_id" ref="stock.menu_product_in_config_stock"/>
+        <field name="action" ref="action_pharmacist_shape"/>
+        <field name="sequence" eval="10"/>
+    </record>
+
+</odoo>

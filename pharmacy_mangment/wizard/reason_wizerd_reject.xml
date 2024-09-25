@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+  <!-- Wizard View -->
+        <record id="view_reject_reason_wizard_form" model="ir.ui.view">
+            <field name="name">Reject Reason Wizard Form</field>
+            <field name="model">reject.reason.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Reject Reason Wizard">
+                    <sheet>
+                        <group>
+                    
+                            <field name="reason_reject"/>
+                        </group>
+                    </sheet>
+                    <footer>
+                        <button name="action_reject_quotation" string="Reject Quotation" type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+    </odoo>

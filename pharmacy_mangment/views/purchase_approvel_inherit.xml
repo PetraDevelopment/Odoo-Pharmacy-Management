@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="purchase_order_approval_inherit" model="ir.ui.view">
+        <field name="name">purchase.order.approval.view.custom</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="arch" type="xml">
+
+            <xpath expr="//field[@name='state']" position="attributes">
+                <attribute name="widget">statusbar</attribute>
+                <attribute name="statusbar_visible">draft,sent,waiting_for_verify,waiting_for_approval,purchase</attribute>
+            </xpath>
+
+            <xpath expr="//form[@class='o_purchase_order']/header/button[@name='button_cancel']" position="before">
+                <button name="submit_for_verify" type="object" string="Submit FOR VERIFY" class="btn btn-primary"/>
+            </xpath>
+
+            <button name="submit_for_verify" position="attributes">
+								<attribute name="attrs">{'invisible': [
+									('state', 'not in', [ 'draft']),
+								]}</attribute>
+								 <attribute name="string">Submit to Verify</attribute> 
+					<attribute name="groups">pharmacy_mangment.group_verify_purchase</attribute>
+								
+				 </button>
+
+        
+
+            <xpath expr="//header/button[@id='draft_confirm']" position="attributes">
+                <attribute name="class">btn-primary</attribute>
+                <attribute name="groups">pharmacy_mangment.group_approve_purchase</attribute>
+				<attribute name="attrs">{'invisible': [('state', 'not in', ['draft'])]}</attribute>
+
+            </xpath>
+
+        
+
+            <xpath expr="//header/button[@id='bid_confirm']" position="attributes">
+            
+                <attribute name="groups">pharmacy_mangment.group_approve_purchase</attribute>
+                <!-- <attribute name="name">button_confirm</attribute> -->
+                <attribute name="attrs">{'invisible': [('state', 'not in', [ 'waiting_for_approval'])]}</attribute>
+
+
+            </xpath>
+
+
+
+
+            <xpath expr="//header/button[@name='button_cancel']" position="attributes">  
+                <attribute name="groups">pharmacy_mangment.group_approve_purchase,base.group_erp_manager</attribute>
+                <attribute name="attrs">{'invisible': [('state', '!=', 'purchase')]}</attribute>
+            </xpath>
+
+            <xpath expr="//header/button[@name='button_draft']" position="after">
+                <button name="reject_approve" type="object" string="REJECT" class="btn btn-primary"/>
+            </xpath>
+
+            <xpath expr="//header/button[@name='reject_approve']" position="attributes">
+                <attribute name="string">Reject</attribute>
+                <attribute name="attrs">{'invisible': [('state', 'not in', ['waiting_for_verify', 'waiting_for_approval'])]}</attribute>
+                <attribute name="groups">pharmacy_mangment.group_approve_purchase,base.group_erp_manager</attribute>
+            </xpath>
+
+            <xpath expr="//header/button[@id='bid_confirm']" position="after">
+                <button name="submit_for_approval" type="object" string="VERIFY &amp; submit FOR APPROVAL" groups="pharmacy_mangment.group_approve_purchase" class="btn btn-primary" />
+
+			</xpath>
+
+            <xpath expr="//header/button[@name='submit_for_approval']" position="attributes">
+                <attribute name="attrs">{'invisible': [('state', 'not in', ['waiting_for_verify'])]}</attribute>
+                <attribute name="groups">pharmacy_mangment.group_approve_purchase,base.group_erp_manager</attribute>
+            </xpath>
+			
+
+            <!-- <xpath expr="//header/button[@name='action_view_picking']" position="attributes">
+                <attribute name="attrs">{'invisible': [('state', 'not in', ['purchase'])]}</attribute>
+                <attribute name="groups">pharmacy_mangment.group_receive_purchase,base.group_erp_manager</attribute>
+            </xpath> -->
+
+            <!-- Ensure visibility of the Receipt button -->
+            <!-- <xpath expr="//header/button[@name='button_receipt']" position="attributes">
+                <attribute name="attrs">{'invisible': [('state', 'not in', ['purchase'])]}</attribute>
+                <attribute name="groups">pharmacy_mangment.group_receive_purchase,base.group_erp_manager</attribute>
+            </xpath> -->
+
+	
+
+        </field>
+    </record>
+
+
+    <!-- <record id="purchase_order_approval_inherit_form" model="ir.ui.view">
+        <field name="name">purchase.order.approval.view.custom.form</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase_stock.purchase_order_view_form_inherit"/>
+        <field name="arch" type="xml">
+
+            <xpath expr="//div[hasclass('oe_button_box')]" position="inside">
+                <button type="object" name="action_view_picking" class="oe_stat_button" icon="fa-truck" attrs="{'invisible':[('incoming_picking_count','=', 0)]}" groups="stock.group_stock_user">
+                    <field name="incoming_picking_count" widget="statinfo" string="Receipt" help="Incoming Shipments"/>
+                </button>
+            </xpath>
+        </field>    
+    </record>     -->
+
+    <menuitem id="menu_purchase_quotation_reject_reason" 
+              name="Quotation Reject Reason"
+              parent="purchase.menu_purchase_config"
+              action="action_quotation_reject_reason" 
+              sequence="60"/>
+</odoo>

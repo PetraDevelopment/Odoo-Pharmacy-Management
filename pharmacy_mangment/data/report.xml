@@ -1,0 +1,14 @@
+<odoo>
+<report
+    id="report_cash_transaction_in"
+    model="pos.session"
+    string="Cash Transaction In"
+    report_type="qweb-pdf"
+    name="pharmacy_mangment.report_cash_transaction_in"
+    file="pharmacy_mangment.report_cash_transaction_in"
+    print_report_name="'Cash Transaction In - %s' % (object.name)"
+/>
+
+
+
+</odoo>

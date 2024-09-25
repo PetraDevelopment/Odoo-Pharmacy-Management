@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+     <record id="action_quotation_reject_reason" model="ir.actions.act_window">
+    <field name="name">Quotation Reject Reason</field>
+    <field name="res_model">quotation.reject.reason</field>
+    <field name="type">ir.actions.act_window</field>
+    <field name="view_mode">tree,form</field>
+</record>
+
+     
+<!--form and tree -->
+
+    <record id= "view_quotation_reject_reason_form" model="ir.ui.view">
+     <field name= "name">quotation.reject.reason.form</field>                 
+     <field name="model">quotation.reject.reason</field>
+     <field name="type">form</field>
+     <field name="arch" type="xml">
+        <form> 
+            <sheet> 
+                <group>          
+                    <group>
+                        <field name="reason"/>
+                        </group>
+                    </group>
+            </sheet>
+            <div class="oe_chatter">
+                <field name="message_follower_ids"/>
+                <field name="message_ids"/>
+                </div>
+        </form>
+    </field>
+    </record>
+
+    <record id= "view_quotation_reject_reason_tree" model="ir.ui.view">
+     <field name= "name">Quotation Reject Reason</field>                 
+     <field name="model">quotation.reject.reason</field>
+        <field name="arch" type="xml">
+        
+            <tree> 
+                        
+                <field name="name"/>
+                <field name="reason"/>
+                <field name="create_uid"/>
+                <field name="create_date"/>
+                        
+                                    <!-- <button string="Print" type="object" class="oe_highlight" name="print_report"/> -->
+            </tree>
+        </field>
+     </record>
+</odoo>
+
+

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    
+    <record id="view_effective_material_form" model="ir.ui.view">
+        <field name="name">effective.material.form</field>
+        <field name="model">effective.material</field>
+        <field name="arch" type="xml">
+            <tree string="Effective Material Form">
+                    <field name="EffectiveMaterial_name"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_effective_material" model="ir.actions.act_window">
+        <field name="name">Effective Material</field>
+        <field name="res_model">effective.material</field>
+        <field name="view_mode">form,tree</field>
+        <field name="view_id" ref="view_effective_material_form"/>
+    </record>
+
+    <record id="menu_effective_material_view" model="ir.ui.menu">
+        <field name="name">Effective Material</field>
+        <field name="parent_id" ref="stock.menu_product_in_config_stock"/>
+        <field name="action" ref="action_effective_material"/>
+        <field name="sequence" eval="10"/>
+    </record>
+
+</odoo>

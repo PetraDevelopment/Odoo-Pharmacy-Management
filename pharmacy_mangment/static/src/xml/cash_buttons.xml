@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+
+    <t t-name="CashIn" owl="1">
+        <div class="control-button">
+            <i class="fa fa-long-arrow-down" role="img" aria-label="Cash In" title="Cash In" /> Cash In
+        </div>
+    </t>
+
+    <t t-name="CashOut" owl="1">
+        <div class="control-button">
+            <i class="fa fa-long-arrow-up" role="img" aria-label="Cash Out" title="Cash Out" /> Cash Out
+        </div>
+    </t>
+</templates>
+
+
